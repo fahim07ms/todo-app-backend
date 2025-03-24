@@ -31,7 +31,7 @@ const addTodo = async (req, res) => {
     
     // Try to add a task
     try {
-        const todos = addTodoQuery(title, description, priority, deadline);
+        const todos = addTodoQuery(req.user.user_id, title, description, priority, deadline);
         res.status(201).json({
             message: "Successfully added task!"
         });
