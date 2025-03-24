@@ -1,6 +1,7 @@
 // Create an Express app instance
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const { profileRoute } = require("./routes/authRoutes");
 const { todosRoute } = require("./routes/todoRoutes");
 
@@ -11,7 +12,8 @@ dotenv.config();
 // Port for the application
 const port = process.env.PORT || 3002;
 
-// Middleware for parsing incoming JSON data
+// Middlewares
+app.use(cors());
 app.use(express.json());
 
 // Route for users
