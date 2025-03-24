@@ -5,7 +5,7 @@ const registerUserQuery = async (name, email, phone, username, pass) => {
     // Hash the password
     const hashedPass = await bcrypt.hash(pass, 10);
 
-    const query = `INSERT INTO users (name, email, phone, username, pass) VALUES ($1, $2, $3, $4, $5)`;
+    const query = `INSERT INTO users (name, email, phone, username, pass) VALUES ($1, $2, $3, $4, $5) returning *`;
     const params = [name, email, phone, username, hashedPass];
     const result = await db.query(query, params);
     return result;
@@ -32,7 +32,7 @@ const getProfileQuery = async (user_id) => {
 };
 
 const deleteUserQuery = async (user_id) => {
-    const query = `DELETE FROM users WHERE user_id = $1`;
+    const query = `DELETE FROM users WHERE user_id = $1 returning *`;
     const params = [user_id];
     const result = await db.query(query, params);
     return result;

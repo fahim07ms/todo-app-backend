@@ -4,7 +4,7 @@ const { getSingleTodoQuery, addTodoQuery, updateTodoQuery, getTodosQuery, delete
 // Controller for getting all todos of a user
 const getTodos = async (req, res) => {
     try {
-        const todos = getTodosQuery(req.user.user_id);
+        const todos = await getTodosQuery(req.user.user_id);
         if (todos.rows.length === 0) {
             res.status(204).json(todos.rows[0]);
             return;
@@ -31,7 +31,7 @@ const addTodo = async (req, res) => {
     
     // Try to add a task
     try {
-        const todos = addTodoQuery(req.user.user_id, title, description, priority, deadline);
+        const todos = await addTodoQuery(req.user.user_id, title, description, priority, deadline);
         res.status(201).json({
             message: "Successfully added task!"
         });
@@ -47,9 +47,8 @@ const addTodo = async (req, res) => {
 const updateTodo = async (req, res) => {
     const { title, description, priority, deadline, is_completed } = req.body;
     
-    
     try {
-        const todos = updateTodoQuery(req.user.user_id, req.params.id, title, description, priority, deadline, is_completed);
+        const todos = await updateTodoQuery(req.user.user_id, req.params.id, title, description, priority, deadline, is_completed);
         if (todos.rows.length === 0) {
             res.status(204).json(todos.rows[0]);
             return;
@@ -68,7 +67,7 @@ const updateTodo = async (req, res) => {
 const getSingleTodo = async (req, res) => {
     
     try {
-        const todos = getSingleTodoQuery(req.user.user_id, req.params.id);
+        const todos = await getSingleTodoQuery(req.user.user_id, req.params.id);
         if (todos.rows.length === 0) {
             res.status(204).json(todos.rows[0]);
             return;
@@ -86,7 +85,7 @@ const getSingleTodo = async (req, res) => {
 // Controller for deleting a todo
 const deleteTodo = async (req, res) => {
     try {
-        const todos = deleteTodoQuery(req.user.user_id, req.params.id);
+        const todos = await deleteTodoQuery(req.user.user_id, req.params.id);
 
         if (todos.rows.length === 0) {
             res.status(204).json(todos.rows[0]);

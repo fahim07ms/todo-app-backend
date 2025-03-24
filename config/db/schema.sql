@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS todos (
     priority INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     deadline TIMESTAMPTZ,
+    is_completed boolean DEFAULT false,
     
     CONSTRAINT fk_user
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE

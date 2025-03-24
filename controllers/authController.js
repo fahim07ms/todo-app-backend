@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const { registerUserQuery, loginUserQuery, getAllUsersQuery, getProfileQuery, deleteUserQuery } = require("../models/userModel");
 
 // Middleware for token verification
@@ -38,8 +39,8 @@ const registerUser = async (req, res) => {
     }
 
     try {
-        const user = registerUserQuery(name, email, phone, username, pass);
-        if (user.rows.length !== 1) {
+        const user = await registerUserQuery(name, email, phone, username, pass);
+        if (user.rows.length === 0) {
             res.status(400).json({ error: "Can't register" });
             return;
         }  
@@ -58,7 +59,7 @@ const loginUser = async (req, res) => {
 
     try {
         // Find the user
-        const result = loginUserQuery(username);
+        const result = await loginUserQuery(username);
         if (result.rows.length === 0) {
             res.status(401).json({
                 error: "User not found!",
@@ -101,7 +102,7 @@ const getAllUsers = async (req, res) => {
     }
 
     try {
-        const users = getAllUsers();
+        const users = await getAllUsersQuery();
     
         if (users.rows.length === 0) {
             res.status(404).send(users.rows[0]);
@@ -124,7 +125,7 @@ const getProfile = async (req, res) => {
 
     // Find the user
     try {
-        const result = getProfileQuery(user_id);
+        const result = await getProfileQuery(user_id);
         if (result.rows.length === 0) {
             res.status(401).json({
                 error: "User not found!",
@@ -148,7 +149,7 @@ const deleteUser = async (req, res) => {
     const user_id = req.user.user_id;
 
     try {
-        const result = deleteUserQuery(user_id);
+        const result = await deleteUserQuery(user_id);
         if (result.rows.length === 0) {
             res.send(404).json({ error: "No such user" });
             return;

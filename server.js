@@ -1,8 +1,8 @@
 // Create an Express app instance
 const express = require("express");
 const app = express();
-const { profileRoute } = require("./routes/profile");
-const { todosRoute } = require("./routes/todos");
+const { profileRoute } = require("./routes/authRoutes");
+const { todosRoute } = require("./routes/todoRoutes");
 
 // Dotenv for environment file
 const dotenv = require("dotenv");

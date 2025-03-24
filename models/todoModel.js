@@ -8,7 +8,7 @@ const getTodosQuery = async (user_id) => {
 };
 
 const addTodoQuery = async (user_id, title, description, priority, deadline) => {
-    const sql = `INSERT INTO todos (user_id, title, description, priority, deadline) VALUES ($1, $2, $3, $4, $5)`;
+    const sql = `INSERT INTO todos (user_id, title, description, priority, deadline) VALUES ($1, $2, $3, $4, $5) returning *`;
     const params = [user_id, title, description, priority, deadline];
     const result = await db.query(sql, params);
     return result;
