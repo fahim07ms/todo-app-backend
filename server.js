@@ -20,7 +20,7 @@ app.use("/api/todos/", todosRoute);
 
 // Root route endpoint
 app.get('/', (req, res) => {
-    res.send("Server is running!!!");
+    res.json({ messgage: "Server is running!!!" });
 });
 
 // Testing the app when server starts
