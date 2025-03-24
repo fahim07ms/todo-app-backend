@@ -1,0 +1,1 @@
+INSERT INTO todos (user_id, title, description, deadline, priority) VALUES (3, 'Je;;p', null, null, 2);
