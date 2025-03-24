@@ -1,7 +1,7 @@
 // Create an Express app instance
 const express = require("express");
 const app = express();
-const { profileRoute, verifyToken } = require("./routes/profile");
+const { profileRoute } = require("./routes/profile");
 const todosRoute = require("./routes/todos");
 
 // Dotenv for environment file

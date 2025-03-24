@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 const jwt = require("jsonwebtoken");
-const { profileRoute, verifyToken } = require("./profile");
+const { profileRoute, verifyToken } = require("./authRoutes");
+
+
+// Import necessary controllers
 
 
 // Get request for `/api/todos` route
