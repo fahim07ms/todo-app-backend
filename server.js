@@ -2,7 +2,7 @@
 const express = require("express");
 const app = express();
 const { profileRoute } = require("./routes/profile");
-const todosRoute = require("./routes/todos");
+const { todosRoute } = require("./routes/todos");
 
 // Dotenv for environment file
 const dotenv = require("dotenv");

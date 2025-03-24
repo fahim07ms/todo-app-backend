@@ -1,6 +1,5 @@
-const db = require("../config/db");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const { registerUserQuery, loginUserQuery, getAllUsersQuery, getProfileQuery, deleteUserQuery } = require("../models/userModel");
 
 // Middleware for token verification
 const verifyToken = (req, res, next) => {
@@ -38,13 +37,13 @@ const registerUser = async (req, res) => {
         return;
     }
 
-    // Hash the password
-    const hashedPass = await bcrypt.hash(pass, 10);
-
     try {
-        const query = `INSERT INTO users (name, email, phone, username, pass) VALUES ($1, $2, $3, $4, $5)`;
-        const params = [name, email, phone, username, hashedPass];
-        await db.query(query, params);
+        const user = registerUserQuery(name, email, phone, username, pass);
+        if (user.rows.length !== 1) {
+            res.status(400).json({ error: "Can't register" });
+            return;
+        }  
+
         res.status(201).json({ message: "User registered successfully!" });
     } catch (err) {
         console.error(err);
@@ -59,7 +58,7 @@ const loginUser = async (req, res) => {
 
     try {
         // Find the user
-        const result = await db.query("SELECT * FROM users WHERE username = $1", [username]);
+        const result = loginUserQuery(username);
         if (result.rows.length === 0) {
             res.status(401).json({
                 error: "User not found!",
@@ -96,9 +95,13 @@ const loginUser = async (req, res) => {
 
 // Controller for accessing all users
 const getAllUsers = async (req, res) => {
+    if (req.user.role !== 'admin') {
+        res.status(403).json({ error: "Forbidden! You are not an administrator." });
+        return;
+    }
+
     try {
-        const sql = `SELECT * FROM users`;
-        const users = await db.query(sql);
+        const users = getAllUsers();
     
         if (users.rows.length === 0) {
             res.status(404).send(users.rows[0]);
@@ -121,7 +124,7 @@ const getProfile = async (req, res) => {
 
     // Find the user
     try {
-        const result = await db.query("SELECT * FROM users WHERE user_id = $1", [user_id]);
+        const result = getProfileQuery(user_id);
         if (result.rows.length === 0) {
             res.status(401).json({
                 error: "User not found!",
@@ -145,9 +148,11 @@ const deleteUser = async (req, res) => {
     const user_id = req.user.user_id;
 
     try {
-        const sql = "DELETE FROM users WHERE user_id = $1";
-        await db.query(sql, [user_id]);
-
+        const result = deleteUserQuery(user_id);
+        if (result.rows.length === 0) {
+            res.send(404).json({ error: "No such user" });
+            return;
+        } 
         res.status(200).json({
             message: "User deleted successfully!"
         });
