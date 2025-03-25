@@ -8,11 +8,8 @@ const { registerUserQuery, loginUserQuery, getAllUsersQuery, getProfileQuery, de
 dotenv.config();
 
 const redisClient = redis.createClient({
-    socket: {
-        url: process.env.REDIS_URL,
-    },
-    password: process.env.REDIS_PASSWORD
-}).connect();
+    url: process.env.REDIS_URL,
+});
 
 
 // Middleware for token verification
