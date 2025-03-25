@@ -7,7 +7,7 @@ const cookieParser = require("cookie-parser");
 
 // Swagger 
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json');
+const { swaggerSpec } = require("./swaggerConfig");
 
 const { profileRoute } = require("./routes/authRoutes");
 const { todosRoute } = require("./routes/todoRoutes");
@@ -27,7 +27,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/users/", profileRoute);
 app.use("/api/todos/", todosRoute);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Root route endpoint
 app.get('/', (req, res) => {
