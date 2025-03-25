@@ -11,6 +11,10 @@ const redisClient = redis.createClient({
     url: process.env.REDIS_URL,
 });
 
+async () => {
+    await redisClient.connect();
+    console.log('Redis connected successfully!');
+}
 
 // Middleware for token verification
 const verifyToken = async (req, res, next) => {
