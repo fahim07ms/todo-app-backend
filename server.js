@@ -5,6 +5,10 @@ const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
+// Swagger 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
 const { profileRoute } = require("./routes/authRoutes");
 const { todosRoute } = require("./routes/todoRoutes");
 
@@ -20,9 +24,10 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// Route for users
+// Routes
 app.use("/api/users/", profileRoute);
 app.use("/api/todos/", todosRoute);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Root route endpoint
 app.get('/', (req, res) => {
