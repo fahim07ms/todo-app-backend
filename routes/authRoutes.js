@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // Import Controllers
-const { verifyToken, registerUser, loginUser, logoutUser, getAllUsers, getProfile, deleteUser } = require("../controllers/authController");
+const { verifyToken, registerUser, loginUser, logoutUser, getAllUsers, getProfile, deleteUser, refreshToken } = require("../controllers/authController");
 
 // Signup Route
 router.post("/register", registerUser);
@@ -21,6 +21,9 @@ router.get("/profile", verifyToken, getProfile);
 
 // Delete a user
 router.delete("/delete", verifyToken, deleteUser);
+
+// Refresh token route
+router.post('/refresh-token', refreshToken);
 
 
 module.exports = {

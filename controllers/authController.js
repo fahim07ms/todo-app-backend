@@ -1,15 +1,31 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const redis = require("redis");
 const { registerUserQuery, loginUserQuery, getAllUsersQuery, getProfileQuery, deleteUserQuery } = require("../models/userModel");
 
+const redisClient = redis.createClient({
+    socket: {
+        url: process.env.REDIS_URL,
+        tls: {} // Enables secure connection
+    },
+    password: process.env.REDIS_PASSWORD
+});
+
+
 // Middleware for token verification
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
     // Get token
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
         res.status(403).json({
             error: "Access denied. Token missing!"
         });
+        return;
+    }
+
+    const isBlacklisted = await redisClient.get(token);
+    if (isBlacklisted) {
+        res.status(403).json({ error: "Token is blacklisted. Please log in again." });
         return;
     }
 
@@ -21,12 +37,38 @@ const verifyToken = (req, res, next) => {
         next();
     } catch (err) {
         console.error(err);
-        res.status(401).json({
-            error: "Invalid or expired token"
-        });
+        res.status(401).json({ error: "Invalid or expired token" });
         return;
     }
 };  
+
+// Middleware for accessing new access token
+const refreshToken = async (req, res) => {
+    // Get refreshToken from the cookies
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        res.status(403).json({ error: "Refresh token missing!" });
+        return;
+    }
+
+    try {
+        // Verify refresh token 
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET);
+
+        const newAccessToken = jwt.sign(
+            { user_id: user.user_id, username: username, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "30m" }
+        );
+
+        res.status(200).json({ accessToken: newAccessToken });
+    } catch (err) {
+        console.error(err);
+        res.status(403).json({ error: "Invalid or expired refresh token!" });
+        return;
+    }   
+};
 
 // User registration Controller
 const registerUser = async (req, res) => {
@@ -107,9 +149,30 @@ const loginUser = async (req, res) => {
     }
 };
 
+// Controller for logging out user
 const logoutUser = async (req, res) => {
-    
+    // Extract tokens
+    const accessToken = req.headers['authorization']?.split(' ')[1];
+    const refreshToken = req.cookies.refreshToken;
+
+    try {
+        if (accessToken) {
+            await redisClient.set(accessToken, "blacklisted", { EX: 900 })
+        } 
+
+        res.clearCokie("refreshToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "Strict"
+        });
+
+        res.status(200).json({ message: "Successfully logged out." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error during logout." });
+    }
 };
+
 
 // Controller for accessing all users
 const getAllUsers = async (req, res) => {
@@ -194,4 +257,5 @@ module.exports = {
     getAllUsers,
     getProfile,
     deleteUser,
+    refreshToken
 }

@@ -1,7 +1,10 @@
 // Create an Express app instance
 const express = require("express");
 const app = express();
+
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 const { profileRoute } = require("./routes/authRoutes");
 const { todosRoute } = require("./routes/todoRoutes");
 
@@ -15,6 +18,7 @@ const port = process.env.PORT || 3002;
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Route for users
 app.use("/api/users/", profileRoute);
