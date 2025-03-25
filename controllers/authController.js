@@ -7,11 +7,9 @@ const { registerUserQuery, loginUserQuery, getAllUsersQuery, getProfileQuery, de
 // Dotenv for environment file
 dotenv.config();
 
-
 const redisClient = redis.createClient({
     socket: {
         url: process.env.REDIS_URL,
-        tls: {} // Enables secure connection
     },
     password: process.env.REDIS_PASSWORD
 });
