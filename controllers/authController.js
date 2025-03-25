@@ -11,13 +11,22 @@ const redisClient = redis.createClient({
     url: process.env.REDIS_URL,
 });
 
-async () => {
-    await redisClient.connect();
-    console.log('Redis connected successfully!');
-}
+(async () => {
+    try {
+        await redisClient.connect();
+        console.log('Redis Client Connected');
+    } catch (err) {
+        console.error('Redis Connection Error:', err);
+    }
+})();
+
+// Redis error handling
+redisClient.on('error', (err) => {
+    console.error('Redis Error:', err);
+});
 
 // Middleware for token verification
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
     // Get token
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
@@ -27,11 +36,10 @@ const verifyToken = (req, res, next) => {
         return;
     }
 
-    const isBlacklisted = redisClient.get(token);
-    res.cookie("abc", isBlacklisted);
+    const isBlacklisted = await redisClient.get(token);
 
     if (isBlacklisted) {
-        res.status(403).json({ error: isBlacklisted });
+        res.status(403).json({ error: "Token is blacklisted. Please log in again." });
         return;
     }
 
@@ -60,10 +68,11 @@ const refreshToken = async (req, res) => {
 
     try {
         // Verify refresh token 
-        const decoded = jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET);
+        const {user_id, username, role} = jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET);
 
+        // Create new access token
         const newAccessToken = jwt.sign(
-            { user_id: user.user_id, username: username, role: user.role },
+            {user_id: user_id, username: username, role: role},
             process.env.JWT_SECRET,
             { expiresIn: "30m" }
         );
@@ -86,8 +95,11 @@ const registerUser = async (req, res) => {
         return;
     }
 
+    // Register user in db
     try {
         const user = await registerUserQuery(name, email, phone, username, pass);
+
+        // If a empty row returned then could not register
         if (user.rows.length === 0) {
             res.status(400).json({ error: "Can't register" });
             return;
@@ -161,10 +173,16 @@ const logoutUser = async (req, res) => {
 
     try {
         if (accessToken) {
-            await redisClient.set(accessToken, "blacklisted", { EX: 900 })
+            // Get token expiration time
+            const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+            const timeToExpiry = decoded.exp - Math.floor(Date.now() / 1000);
+
+            // Set the access token to be blacklisted true
+            await redisClient.set(accessToken, "true", { EX: Math.max(timeToExpiry, 0) })
         } 
 
-        res.clearCokie("refreshToken", {
+        // Clear the refresh token
+        res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: true,
             sameSite: "Strict"
@@ -180,11 +198,13 @@ const logoutUser = async (req, res) => {
 
 // Controller for accessing all users
 const getAllUsers = async (req, res) => {
+    // Only admin can get all users
     if (req.user.role !== 'admin') {
         res.status(403).json({ error: "Forbidden! You are not an administrator." });
         return;
     }
 
+    // Try to get all users
     try {
         const users = await getAllUsersQuery();
     
@@ -217,6 +237,7 @@ const getProfile = async (req, res) => {
             return;
         }
 
+        // Don't show the password
         const { pass, ...userWithoutPass } = result.rows[0];
         res.status(200).json(userWithoutPass);
     } catch (err) {

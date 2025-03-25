@@ -23,7 +23,7 @@ router.get("/profile", verifyToken, getProfile);
 router.delete("/delete", verifyToken, deleteUser);
 
 // Refresh token route
-router.post('/refresh-token', refreshToken);
+router.post('/refresh-token', verifyToken, refreshToken);
 
 
 module.exports = {
