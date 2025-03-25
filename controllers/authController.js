@@ -61,9 +61,7 @@ const loginUser = async (req, res) => {
         // Find the user
         const result = await loginUserQuery(username);
         if (result.rows.length === 0) {
-            res.status(401).json({
-                error: "User not found!",
-            });
+            res.status(401).json({ error: "User not found!" });
             return;
         }
 
@@ -72,26 +70,45 @@ const loginUser = async (req, res) => {
         // Compare provided password with the stored hashed password
         const passMatch = bcrypt.compare(pass, user.pass);
         if (!passMatch) {
-        res.status(403).json({
-            error: "Invalid credentials!",
-        });
-        return;
+            res.status(403).json({ error: "Invalid credentials!" });
+            return;
         }
 
-        // Create the JWT Token
-        const token = jwt.sign(
+
+
+        // Create the JWT Access Token
+        const accessToken = jwt.sign(
             { user_id: user.user_id, username: username, role: user.role }, // Payload
             process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "30m" }
         );
 
+        // Create the JWT Refresh Token
+        const refreshToken = jwt.sign(
+            { user_id: user.user_id, username: username, role: user.role }, // Payload
+            process.env.REFRESH_JWT_SECRET,
+            { expiresIn: "24h" }
+        );
+
+        // Store refresh token in an HTTP-only cookie
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,    
+            secure: true,      
+            sameSite: "Strict", 
+            maxAge: 24 * 60 * 60 * 1000 // 1 day in milliseconds
+        });
+
         // Send the token
-        res.status(201).json({ token });
+        res.status(201).json({ accessToken });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Server error while loggin in!" });
         return;
     }
+};
+
+const logoutUser = async (req, res) => {
+    
 };
 
 // Controller for accessing all users
@@ -173,6 +190,7 @@ module.exports = {
     verifyToken,
     registerUser,
     loginUser,
+    logoutUser,
     getAllUsers,
     getProfile,
     deleteUser,
