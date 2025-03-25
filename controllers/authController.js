@@ -4,8 +4,9 @@ const redis = require("redis");
 const dotenv = require("dotenv");
 const { registerUserQuery, loginUserQuery, getAllUsersQuery, getProfileQuery, deleteUserQuery } = require("../models/userModel");
 
-
+// Dotenv for environment file
 dotenv.config();
+
 
 const redisClient = redis.createClient({
     socket: {
