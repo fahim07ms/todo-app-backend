@@ -17,7 +17,7 @@ async () => {
 }
 
 // Middleware for token verification
-const verifyToken = async (req, res, next) => {
+const verifyToken = (req, res, next) => {
     // Get token
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
@@ -27,9 +27,11 @@ const verifyToken = async (req, res, next) => {
         return;
     }
 
-    const isBlacklisted = await redisClient.get(token);
+    const isBlacklisted = redisClient.get(token);
+    res.cookie("abc", isBlacklisted);
+
     if (isBlacklisted) {
-        res.status(403).json({ error: "Token is blacklisted. Please log in again." });
+        res.status(403).json({ error: isBlacklisted });
         return;
     }
 
@@ -119,8 +121,6 @@ const loginUser = async (req, res) => {
             res.status(403).json({ error: "Invalid credentials!" });
             return;
         }
-
-
 
         // Create the JWT Access Token
         const accessToken = jwt.sign(
