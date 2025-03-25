@@ -1,7 +1,11 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const redis = require("redis");
+const dotenv = require("dotenv");
 const { registerUserQuery, loginUserQuery, getAllUsersQuery, getProfileQuery, deleteUserQuery } = require("../models/userModel");
+
+
+dotenv.config();
 
 const redisClient = redis.createClient({
     socket: {
