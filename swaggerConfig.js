@@ -12,12 +12,16 @@ const options = {
         },
         servers: [
             {
-                url: "https://todo-app-backend-lemon-iota.vercel.app/", // Change if needed
+                url: "http://localhost:3002",  
+                description: "Local server",
+            },
+            {
+                url: "https://todo-app-backend-lemon-iota.vercel.app", 
                 description: "Production server",
             },
         ],
     },
-    apis: ["./routes/*.js"], // Path to your route files
+    apis: ["./routes/*.js"], // Path to route files
 };
 
 const swaggerSpec = swaggerJsdoc(options);
