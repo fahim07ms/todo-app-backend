@@ -91,7 +91,7 @@ const deleteTodo = async (req, res) => {
             res.status(204).json(todos.rows[0]);
             return;
         } else {
-            res.status(200).json(todos.rows[0]);
+            res.status(200).json({ message: "Todo deleted successfully" });
         }
     } catch (err) {
         console.log(err);

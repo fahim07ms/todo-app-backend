@@ -8,6 +8,8 @@ const cookieParser = require("cookie-parser");
 // Swagger 
 const swaggerUi = require('swagger-ui-express');
 const { swaggerSpec } = require("./swaggerConfig");
+// Custom CSS for swagger
+const CSS_URL = "https://cdn.jsdelivr.net/npm/swagger-ui@5.20.1/dist/swagger-ui.css";
 
 const { profileRoute } = require("./routes/authRoutes");
 const { todosRoute } = require("./routes/todoRoutes");
@@ -27,7 +29,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/users/", profileRoute);
 app.use("/api/todos/", todosRoute);
-app.use('/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {customCssUrl: CSS_URL}));
 
 // Root route endpoint
 app.get('/', (req, res) => {

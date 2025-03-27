@@ -77,7 +77,7 @@ const refreshToken = async (req, res) => {
             { expiresIn: "30m" }
         );
 
-        res.status(200).json({ accessToken: newAccessToken });
+        res.status(201).json({ accessToken: newAccessToken });
     } catch (err) {
         console.error(err);
         res.status(403).json({ error: "Invalid or expired refresh token!" });
@@ -101,7 +101,7 @@ const registerUser = async (req, res) => {
 
         // If a empty row returned then could not register
         if (user.rows.length === 0) {
-            res.status(400).json({ error: "Can't register" });
+            res.status(400).json({ error: "Registration failed" });
             return;
         }  
 
@@ -200,7 +200,7 @@ const logoutUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
     // Only admin can get all users
     if (req.user.role !== 'admin') {
-        res.status(403).json({ error: "Forbidden! You are not an administrator." });
+        res.status(403).json({ error: "Forbidden- Admin access required" });
         return;
     }
 
@@ -231,7 +231,7 @@ const getProfile = async (req, res) => {
     try {
         const result = await getProfileQuery(user_id);
         if (result.rows.length === 0) {
-            res.status(401).json({
+            res.status(404).json({
                 error: "User not found!",
             });
             return;
