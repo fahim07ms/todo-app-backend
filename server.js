@@ -29,7 +29,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/users/", profileRoute);
 app.use("/api/todos/", todosRoute);
-app.use('/api/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {customCssUrl: CSS_URL}));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {customCssUrl: CSS_URL}));
 
 // Root route endpoint
 app.get('/', (req, res) => {
