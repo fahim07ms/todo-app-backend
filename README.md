@@ -12,6 +12,8 @@ A RESTful API backend for a Todo application built with Express.js, PostgreSQL, 
 
 ## API Endpoints
 
+The API Documentation is available [here](https://todo-app-backend-lemon-iota.vercel.app/api/docs).
+
 ### Authentication Routes
 
 ```
@@ -38,19 +40,35 @@ DELETE /api/todos/:id - Delete todo
 ## Project Structure
 
 ```
-todo-app-backend/
-├── controllers/
-│   ├── authController.js
-│   └── todoController.js
-├── models/
-│   ├── userModel.js
-│   └── todoModel.js
-├── routes/
-│   ├── authRoutes.js
-│   └── todoRoutes.js
-├── config/
-│   └── db.js
-├── .env
-├── package.json
-└── index.js
+api/
+  index.js
+
+config/
+  db/
+    schema.sql
+    seed.sql
+  db.js
+
+controllers/
+  authController.js
+  todoController.js
+
+models/
+  todoModel.js
+  userModel.js
+
+routes/
+  authRoutes.js
+  todoRoutes.js
+  
+package-lock.json
+package.json
+README.md
+server.js
+swagger-ui.css
+swagger.js
+swaggerConfig.js
+vercel.json
 ```
+
+
